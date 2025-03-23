@@ -17,8 +17,8 @@ function Navbar({}: Props) {
             </p>
 
             <section className='flex gap-2 items-center'>
-                <MdMyLocation className='text-2xl text-gray-400 hover:opacity '/>
-                <MdOutlineLocationOn className='text-2xl text-gray-500'/>
+                <MdMyLocation className='text-2xl text-gray-400 hover:opacity cursor-pointer'/>
+                <MdOutlineLocationOn className='text-2xl text-gray-500 cursor-pointer'/>
                 <p className='text-slate-900/80 text-sm'> Lagos </p>
 
                 {/*search bar */}
