@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -13,11 +13,10 @@ import WeatherDetails from "@/components/WeatherDetails";
 import metersToKilometers from "@/utils/metersToKilometers";
 import convertSpeed from "@/utils/convertSpeed";
 import WeatherForecastDetail from "@/components/WeatherForecastDetail";
-
-
+import { placeAtom } from "./Atom";
+import { useAtom } from "jotai";
 
 // API Endpoint
-const API_URL = `https://api.openweathermap.org/data/2.5/forecast?q=abuja&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}&cnt=20`;
 
 type WeatherData = {
   cod: string;
@@ -89,7 +88,11 @@ type Coordinates = {
 };
 
 export default function Home() {
-  const { isPending, error, data } = useQuery<WeatherData>({
+
+  const [place, setPlace] = useAtom(placeAtom);
+  const API_URL = `https://api.openweathermap.org/data/2.5/forecast?q=${place}&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}&cnt=20`;
+
+  const { isPending, error, data, refetch } = useQuery<WeatherData>({
     queryKey: ["weatherData"],
     queryFn: async () => {
       const response = await axios.get<WeatherData>(API_URL);
@@ -97,6 +100,11 @@ export default function Home() {
     },
   });
 
+  useEffect(() => {
+    refetch();
+  }, [place]);
+
+  // Destructuring data for today and weekly weather
   const todayWeather = data?.list[0];
   const weeklyWeather = data?.list.slice(1);
 
@@ -213,11 +221,11 @@ export default function Home() {
               humidity={`${weather?.main.humidity}% `}
               sunrise={format(
                 fromUnixTime(data?.city.sunrise ?? 1702517657),
-                "H:mm"
+                "H:mm a"
               )}
               sunset={format(
                 fromUnixTime(data?.city.sunset ?? 1702517657),
-                "H:mm"
+                "H:mm a"
               )}
               visibility={`${metersToKilometers(weather?.visibility ?? 10000)} `}
               windSpeed={`${convertSpeed(weather?.wind.speed ?? 1.64)} `}

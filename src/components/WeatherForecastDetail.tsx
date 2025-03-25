@@ -45,7 +45,7 @@ export default function WeatherForecastDetail(props: WeatherForecastDetailProps)
           {/* Weather Details */}
           <div className='flex flex-col px-4'>
             <p className="text-4xl whitespace-nowrap">{convertKelvinTOCelsius(temp ?? 0)}°C</p>
-            <p className='text-xs'>Feels like {convertKelvinTOCelsius(feelsLike ?? 0)}°C</p>
+            <p className='text-xs whitespace-nowrap'>Feels like {convertKelvinTOCelsius(feelsLike ?? 0)}°C</p>
             <p className="text-xs space-x-2 whitespace-nowrap">
               <span>{convertKelvinTOCelsius(temp_min ?? 0)}°C↓</span>
               <span>{convertKelvinTOCelsius(temp_max ?? 0)}°C↑</span>
