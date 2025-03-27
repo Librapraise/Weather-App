@@ -7,7 +7,7 @@ import { MdOutlineLocationOn } from "react-icons/md";
 import SearchBox from './SearchBox';
 import axios from 'axios';
 import { useAtom } from 'jotai';
-import { placeAtom } from '@/app/Atom';
+import { loadingCityAtom, placeAtom } from '@/app/Atom';
 
 
 
@@ -66,6 +66,7 @@ function Navbar({}: Props) {
 
     //jotai atom
     const [place, setPlace] = useAtom(placeAtom);
+    const [loadingCity, setLoadingCity] = useAtom(loadingCityAtom);
 
     //handle suggestion
     const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -96,14 +97,20 @@ function Navbar({}: Props) {
     
     //handle onsubmit
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+        setLoadingCity(true);
         e.preventDefault();
         if (suggestions.length == 0) {
             setError('City not found');
             setShowSuggestions(false);
+            setLoadingCity(false);
         }  else {
             setError('');
-            setPlace(city);
-            setShowSuggestions(false);
+            setTimeout(() => {  
+                setPlace(city);
+                setCity('');
+                setShowSuggestions(false);
+                setLoadingCity(false);
+            }, 1000);
         }
     };
 
@@ -123,7 +130,7 @@ function Navbar({}: Props) {
 
             <section className='flex gap-2 items-center'>
                 <MdMyLocation className='text-2xl text-gray-400 hover:opacity cursor-pointer'/>
-                <MdOutlineLocationOn className='text-2xl text-gray-500 cursor-pointer'/>
+                <MdOutlineLocationOn className='text-2xl cursor-pointer'/>
                 <p className='text-slate-900/80 text-sm capitalize'> 
                     {place}
                 </p>

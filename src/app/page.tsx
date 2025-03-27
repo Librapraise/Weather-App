@@ -13,7 +13,7 @@ import WeatherDetails from "@/components/WeatherDetails";
 import metersToKilometers from "@/utils/metersToKilometers";
 import convertSpeed from "@/utils/convertSpeed";
 import WeatherForecastDetail from "@/components/WeatherForecastDetail";
-import { placeAtom } from "./Atom";
+import { loadingCityAtom, placeAtom } from "./Atom";
 import { useAtom } from "jotai";
 
 // API Endpoint
@@ -90,6 +90,7 @@ type Coordinates = {
 export default function Home() {
 
   const [place, setPlace] = useAtom(placeAtom);
+  const [loadingCity, setLoadingCity] = useAtom(loadingCityAtom);
   const API_URL = `https://api.openweathermap.org/data/2.5/forecast?q=${place}&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}&cnt=20`;
 
   const { isPending, error, data, refetch } = useQuery<WeatherData>({
@@ -108,6 +109,18 @@ export default function Home() {
   const todayWeather = data?.list[0];
   const weeklyWeather = data?.list.slice(1);
 
+  // Helper functions
+  const formatDate = (dateString: string | undefined) => {
+    if (!dateString) return "N/A";
+    const parsedDate = parseISO(dateString);
+    return isNaN(parsedDate.getTime()) ? "Invalid Date" : format(parsedDate, "dd.MM");
+  };
+  
+  const formatDay = (dateString: string | undefined) => {
+    if (!dateString) return "Unknown";
+    const parsedDate = parseISO(dateString);
+    return isNaN(parsedDate.getTime()) ? "Invalid Day" : format(parsedDate, "EEEE");
+  };
 
   const uniqueDates = [
     ...new Set(
@@ -141,6 +154,9 @@ export default function Home() {
     <div className="flex flex-col gap-4 bg-gray-100 min-h-screen">
       <Navbar />
       <main className="px-3 max-w-7xl mx-auto flex flex-col gap-9 pb-10 pt-4 w-full">
+
+      {loadingCity ? (<SkeletonLoader />) :(
+      <>
         {/*today weather forecast */}
         <section className="flex flex-col gap-4 space-y-4">
           <div className="space-y-2">
@@ -212,9 +228,9 @@ export default function Home() {
               weatherIcon={weather?.weather[0].icon ?? "01d"}
               feelsLike={weather?.main.feels_like ?? 0}
               temp={weather?.main.temp ?? 0}
-              description={weather?.weather[0].description ?? ""}
-              date={format(parseISO(weather?.dt_txt ?? ''), 'dd.MM')}
-              day={format(parseISO(weather?.dt_txt ?? ''), 'EEEE')}
+              description={weather?.weather[0].description ?? ""}                  
+              date={formatDate(weather?.dt_txt)}
+              day={formatDay(weather?.dt_txt)}
               temp_min={weather?.main.temp_min ?? 0}
               temp_max={weather?.main.temp_max ?? 0}
               airPressure={`${weather?.main.pressure} hPa `}
@@ -231,6 +247,55 @@ export default function Home() {
               windSpeed={`${convertSpeed(weather?.wind.speed ?? 1.64)} `}
             />
           ))}
+        </section>
+        </>
+        )}
+      </main>
+    </div>
+  );
+}
+
+
+// Skeleton Loader
+
+function SkeletonLoader() {
+  return (
+    <div className="flex flex-col gap-4 bg-gray-100 min-h-screen animate-pulse">
+      {/* Navbar Placeholder */}
+      <div className="h-12 bg-gray-300 w-full" />
+      
+      <main className="px-3 max-w-7xl mx-auto flex flex-col gap-9 pb-10 pt-4 w-full">
+        {/* Today Weather Forecast Skeleton */}
+        <section className="flex flex-col gap-4 space-y-4">
+          <div className="space-y-2">
+            <div className="h-6 w-48 bg-gray-300 rounded" />
+            
+            <div className="flex items-center gap-10 bg-white p-6 rounded shadow">
+              <div className="h-24 w-24 bg-gray-300 rounded-full" />
+              <div className="flex flex-col gap-2">
+                <div className="h-8 w-32 bg-gray-300 rounded" />
+                <div className="h-4 w-24 bg-gray-300 rounded" />
+                <div className="h-4 w-20 bg-gray-300 rounded" />
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        {/* 7-day Weather Forecast Skeleton */}
+        <section className="flex flex-col gap-4 w-full">
+          <div className="h-6 w-48 bg-gray-300 rounded" />
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[...Array(7)].map((_, index) => (
+              <div key={index} className="p-4 bg-white shadow rounded flex items-center gap-4">
+                <div className="h-12 w-12 bg-gray-300 rounded-full" />
+                <div className="flex flex-col gap-2">
+                  <div className="h-4 w-24 bg-gray-300 rounded" />
+                  <div className="h-4 w-20 bg-gray-300 rounded" />
+                </div>
+              </div>
+            ))}
+          </div>
         </section>
       </main>
     </div>
