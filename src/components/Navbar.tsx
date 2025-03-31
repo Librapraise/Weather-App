@@ -120,7 +120,40 @@ function Navbar({}: Props) {
         setShowSuggestions(false);
     }
 
+
+    //handle current location
+    //get current location
+    function handleCurrentLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(async(position) => {
+                const { latitude, longitude } = position.coords;
+                try {
+                    // Fetch weather data using latitude and longitude
+                    setLoadingCity(true);
+                    const response = await axios.get(
+                        `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${API_URL}`
+                    );
+                    setTimeout(() => {
+                        setPlace(response.data.name);
+                        setCity('');
+                        setLoadingCity(false);
+                    }
+                    , 1000);
+                } catch (error) {
+                    setLoadingCity(false);
+                    setError('Unable to retrieve weather data');
+                }
+            }, (error) => {
+                console.error('Error getting location:', error);
+                setError('Unable to retrieve location');
+            });
+        } else {
+            alert('Geolocation is not supported by this browser.');
+        }
+    }
+
   return (
+    <>
     <nav className="shadow-sm sticky top-0 left-0 z-50 bg-white">
         <div className="h-[80px] w-full flex justify-between items-center max-w-7xl px-3 mx-auto">
             <p className='flex items-center justify-center gap-2'>
@@ -129,14 +162,18 @@ function Navbar({}: Props) {
             </p>
 
             <section className='flex gap-2 items-center'>
-                <MdMyLocation className='text-2xl text-gray-400 hover:opacity cursor-pointer'/>
+                <MdMyLocation 
+                    title='current location'
+                    onClick={handleCurrentLocation}
+                    className='text-2xl text-gray-400 hover:opacity cursor-pointer'
+                />
                 <MdOutlineLocationOn className='text-2xl cursor-pointer'/>
                 <p className='text-slate-900/80 text-sm capitalize'> 
                     {place}
                 </p>
 
                 {/*search bar */}
-                <div className="relative">
+                <div className="relative hidden md:flex ">
                     {/*search bar */}
                     <SearchBox 
                         value={city}
@@ -156,6 +193,27 @@ function Navbar({}: Props) {
         </div>
 
     </nav>
+
+    <section className='flex max-w-7xl px-3 md:hidden '>
+        {/*search bar */}
+        <div className="relative">
+            {/*search bar */}
+            <SearchBox 
+                value={city}
+                onChange={(e) => handleInputChange(e.target.value)}
+                onSubmit={handleSubmit}
+            />
+            <SuggesstionBox 
+                {...{
+                    showSuggest,
+                    suggestions,
+                    handleSuggestionClick,
+                    error
+                }}
+            />
+        </div>
+    </section>
+    </>
   )
 }
 
