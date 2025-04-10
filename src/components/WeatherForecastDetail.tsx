@@ -1,4 +1,3 @@
-import { cn } from '@/utils/cn'
 import React from 'react'
 import Container from './Container'
 import WeatherDetails, { WeatherDetailsProps } from './WeatherDetails'
@@ -29,7 +28,6 @@ export default function WeatherForecastDetail(props: WeatherForecastDetailProps)
     date = '2021-09-20',
     temp_min = 25,
     temp_max = 25,
-    className,
   } = props;
 
   return (

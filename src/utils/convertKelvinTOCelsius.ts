@@ -1,5 +1,5 @@
-import React from 'react'
-
+// This function converts temperature from Kelvin to Celsius
+// The OpenWeather API returns temperature in Kelvin
 // Function to convert temperature from Kelvin to Celsius
 // Kelvin is the default temperature unit in the OpenWeather API
 // This function converts the temperature from Kelvin to Celsius

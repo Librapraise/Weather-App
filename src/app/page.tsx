@@ -89,8 +89,8 @@ type Coordinates = {
 
 export default function Home() {
 
-  const [place, setPlace] = useAtom(placeAtom);
-  const [loadingCity, setLoadingCity] = useAtom(loadingCityAtom);
+  const [place] = useAtom(placeAtom);
+  const [loadingCity] = useAtom(loadingCityAtom);
   const API_URL = `https://api.openweathermap.org/data/2.5/forecast?q=${place}&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}&cnt=20`;
 
   const { isPending, error, data, refetch } = useQuery<WeatherData>({
@@ -102,12 +102,15 @@ export default function Home() {
   });
 
   useEffect(() => {
-    refetch();
-  }, [place]);
+    if (place) {
+      refetch();
+    }
+  }
+  , [place, refetch]);
 
   // Destructuring data for today and weekly weather
   const todayWeather = data?.list[0];
-  const weeklyWeather = data?.list.slice(1);
+  //const weeklyWeather = data?.list.slice(1);
 
   // Helper functions
   const formatDate = (dateString: string | undefined) => {

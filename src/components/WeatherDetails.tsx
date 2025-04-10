@@ -26,7 +26,7 @@ export function SingleWeatherDetails(props: SingleWeatherDetailsProps) {
 }
 
 
-type Props = {}
+// type Props = {}
 
 {/* Full WeatherDetails */}
 

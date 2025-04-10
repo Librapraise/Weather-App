@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react'
-import { MdSearch, MdSunny } from 'react-icons/md'
+import { MdSunny } from 'react-icons/md'
 import { MdMyLocation } from "react-icons/md";
 import { MdOutlineLocationOn } from "react-icons/md";
 import SearchBox from './SearchBox';
@@ -56,7 +56,16 @@ function SuggesstionBox ({
 const API_URL = process.env.NEXT_PUBLIC_WEATHER_KEY;
 
 
-type Props = {}
+type Props = {
+    className?: string;
+    // onChange: React.ChangeEventHandler<HTMLInputElement> | undefined;
+    // onSubmit: React.FormEventHandler<HTMLFormElement> | undefined;
+    // value: string;
+    // error: string;
+    // suggestions: string[];
+    // showSuggest: boolean;
+    // handleSuggestionClick: (item: string) => void;
+}
 
 function Navbar({}: Props) {
 
@@ -80,7 +89,10 @@ function Navbar({}: Props) {
                 const response = await axios.get(
                     `https://api.openweathermap.org/data/2.5/find?q=${value}&appid=${API_URL}`
                 );
-                const suggestions = response.data.list.map((item: any) => item.name);
+                const suggestions = response.data.list.map((item: { name: string }) => item.name);
+                if (suggestions.length < 1) {   
+                    setError('City not found');
+                }
                 setSuggestions(suggestions);   
                 setError('');
                 setShowSuggestions(true); 
@@ -170,6 +182,7 @@ function Navbar({}: Props) {
                 <MdOutlineLocationOn className='text-2xl cursor-pointer'/>
                 <p className='text-slate-900/80 text-sm capitalize'> 
                     {place}
+                    {loadingCity && <span className='text-gray-400'>...loading</span>}
                 </p>
 
                 {/*search bar */}
